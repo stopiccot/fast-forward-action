@@ -39,6 +39,14 @@ async function run(): Promise<void> {
     });
     core.info(JSON.stringify(pr));
     core.info("==============================");
+    await octokit.rest.git.updateRef({
+      owner: github.context.repo.owner,
+      repo: github.context.repo.repo,
+      ref: `heads/${pr.data.base.ref}`,
+      sha: pr.data.head.sha,
+      force: false
+    });
+    core.info("==============================");
 
     //var restClient = new GitHub(github_token);
 
@@ -49,9 +57,9 @@ async function run(): Promise<void> {
     const ms: string = core.getInput('milliseconds')
     core.debug(`Waiting ${ms} milliseconds ...`) // debug is only output if you set the secret `ACTIONS_STEP_DEBUG` to true
 
-    core.debug(new Date().toTimeString())
-    await wait(parseInt(ms, 10))
-    core.debug(new Date().toTimeString())
+    // core.debug(new Date().toTimeString())
+    // await wait(parseInt(ms, 10))
+    // core.debug(new Date().toTimeString())
 
     core.setOutput('time', new Date().toTimeString())
   } catch (error) {

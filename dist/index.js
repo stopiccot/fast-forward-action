@@ -41,8 +41,6 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 const core = __importStar(__nccwpck_require__(2186));
 const github = __importStar(__nccwpck_require__(5438));
-// import { Octokit } from "@octokit/rest";
-const wait_1 = __nccwpck_require__(5817);
 function get_current_pull_request_number() {
     if (!github.context.payload.issue || !github.context.payload.issue.pull_request) {
         throw new Error('Issue is not a pull request! No pull request found in context');
@@ -75,15 +73,23 @@ function run() {
             });
             core.info(JSON.stringify(pr));
             core.info("==============================");
+            yield octokit.rest.git.updateRef({
+                owner: github.context.repo.owner,
+                repo: github.context.repo.repo,
+                ref: `heads/${pr.data.base.ref}`,
+                sha: pr.data.head.sha,
+                force: false
+            });
+            core.info("==============================");
             //var restClient = new GitHub(github_token);
             // const pr_number = client.get_current_pull_request_number();
             // const source_head = await client.get_pull_request_source_head_async(pr_number);
             // const target_base = await client.get_pull_request_target_base_async(pr_number);
             const ms = core.getInput('milliseconds');
             core.debug(`Waiting ${ms} milliseconds ...`); // debug is only output if you set the secret `ACTIONS_STEP_DEBUG` to true
-            core.debug(new Date().toTimeString());
-            yield (0, wait_1.wait)(parseInt(ms, 10));
-            core.debug(new Date().toTimeString());
+            // core.debug(new Date().toTimeString())
+            // await wait(parseInt(ms, 10))
+            // core.debug(new Date().toTimeString())
             core.setOutput('time', new Date().toTimeString());
         }
         catch (error) {
@@ -93,37 +99,6 @@ function run() {
     });
 }
 run();
-
-
-/***/ }),
-
-/***/ 5817:
-/***/ (function(__unused_webpack_module, exports) {
-
-"use strict";
-
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.wait = void 0;
-function wait(milliseconds) {
-    return __awaiter(this, void 0, void 0, function* () {
-        return new Promise(resolve => {
-            if (isNaN(milliseconds)) {
-                throw new Error('milliseconds not a number');
-            }
-            setTimeout(() => resolve('done!'), milliseconds);
-        });
-    });
-}
-exports.wait = wait;
 
 
 /***/ }),
