@@ -66,14 +66,14 @@ function run() {
             core.info(`PR NUMBER: ${pr_number}`);
             let octokit = github.getOctokit(github_token);
             core.info("==============================");
-            core.info(typeof octokit);
+            core.info(octokit.constructor.name);
             core.info("==============================");
             let pr = yield octokit.rest.pulls.get({
                 owner: github.context.repo.owner,
                 repo: github.context.repo.repo,
                 pull_number: pr_number
             });
-            core.info(pr.toString());
+            core.info(JSON.stringify(pr));
             core.info("==============================");
             //var restClient = new GitHub(github_token);
             // const pr_number = client.get_current_pull_request_number();
