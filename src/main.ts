@@ -1,5 +1,6 @@
 import * as core from '@actions/core'
 import * as github from '@actions/github';
+// import { Octokit } from "@octokit/rest";
 import {wait} from './wait'
 
 function get_current_pull_request_number(): number {
@@ -10,12 +11,35 @@ function get_current_pull_request_number(): number {
   return github.context.payload.issue.number;
 };
 
+// async function get_pull_request(octokit: Octokit, pr_number: number): Promise<Octokit.PullsGetResponse> {
+//   const getPrResponse = await octokit.pulls.get({
+//     owner: github.context.repo.owner,
+//     repo: github.context.repo.repo,
+//     pull_number: pr_number
+//   });
+
+//   return getPrResponse.data;
+// };
+
 async function run(): Promise<void> {
   try {
     const github_token = core.getInput('token');
 
     const pr_number = get_current_pull_request_number();
-    core.debug(`PR NUMBER: ${pr_number}`);
+    core.info(`PR NUMBER: ${pr_number}`);
+
+    let octokit = github.getOctokit(github_token);
+    core.info("==============================");
+    core.info(typeof octokit);
+    core.info("==============================");
+    let pr = await octokit.rest.pulls.get({
+      owner: github.context.repo.owner,
+      repo: github.context.repo.repo,
+      pull_number: pr_number
+    });
+    core.info(pr.toString());
+    core.info("==============================");
+
     //var restClient = new GitHub(github_token);
 
     // const pr_number = client.get_current_pull_request_number();

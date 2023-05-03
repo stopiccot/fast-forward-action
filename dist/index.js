@@ -41,6 +41,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 const core = __importStar(__nccwpck_require__(2186));
 const github = __importStar(__nccwpck_require__(5438));
+// import { Octokit } from "@octokit/rest";
 const wait_1 = __nccwpck_require__(5817);
 function get_current_pull_request_number() {
     if (!github.context.payload.issue || !github.context.payload.issue.pull_request) {
@@ -49,12 +50,31 @@ function get_current_pull_request_number() {
     return github.context.payload.issue.number;
 }
 ;
+// async function get_pull_request(octokit: Octokit, pr_number: number): Promise<Octokit.PullsGetResponse> {
+//   const getPrResponse = await octokit.pulls.get({
+//     owner: github.context.repo.owner,
+//     repo: github.context.repo.repo,
+//     pull_number: pr_number
+//   });
+//   return getPrResponse.data;
+// };
 function run() {
     return __awaiter(this, void 0, void 0, function* () {
         try {
             const github_token = core.getInput('token');
             const pr_number = get_current_pull_request_number();
-            core.debug(`PR NUMBER: ${pr_number}`);
+            core.info(`PR NUMBER: ${pr_number}`);
+            let octokit = github.getOctokit(github_token);
+            core.info("==============================");
+            core.info(typeof octokit);
+            core.info("==============================");
+            let pr = yield octokit.rest.pulls.get({
+                owner: github.context.repo.owner,
+                repo: github.context.repo.repo,
+                pull_number: pr_number
+            });
+            core.info(pr.toString());
+            core.info("==============================");
             //var restClient = new GitHub(github_token);
             // const pr_number = client.get_current_pull_request_number();
             // const source_head = await client.get_pull_request_source_head_async(pr_number);
